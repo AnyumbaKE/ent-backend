@@ -99,11 +99,11 @@ AUTH_USER_MODEL = 'echofy.CustomUser'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'earhealth',
-        'USER': 'earuser',
-        'PASSWORD': '2222',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
 
@@ -144,7 +144,42 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# For production deployment
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('MAIL_SERVER')
+EMAIL_PORT = config('MAIL_PORT', cast=int)
+EMAIL_HOST_USER = config('MAIL_USERNAME')
+EMAIL_HOST_PASSWORD = config('MAIL_PASSWORD')
+EMAIL_USE_TLS = config('MAIL_USE_TLS', cast=bool)
+DEFAULT_FROM_EMAIL = f"{config('MAIL_DEFAULT_SENDER_NAME')} <{config('MAIL_DEFAULT_SENDER_EMAIL')}>"
+
+
+CLOUDINARY = {
+    'cloud_name': config('CLOUDINARY_CLOUD_NAME'),
+    'api_key': config('CLOUDINARY_API_KEY'),
+    'api_secret': config('CLOUDINARY_API_SECRET'),
+}
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "HearingAid Admin",
+    "site_header": "HearingAid Admin",
+    "site_brand": "HearingAid",
+    "welcome_sign": "Welcome to the HearingAid dashboard",
+    "search_model": [
+        "myapp.CustomUser",
+        "myapp.PasswordResetOTP",
+        "myapp.TestModel",
+        "myapp.TestSession",
+        "myapp.Blog",
+        "myapp.ReviewModel"
+    ],
+}
