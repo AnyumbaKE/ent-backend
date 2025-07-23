@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'jazzmin',
     'rest_framework_simplejwt',
-    'rest_framework_simplejw.token_blacklist',
+    'rest_framework_simplejwt.token_blacklist',
     'cloudinary',
 ]
 
@@ -53,7 +53,7 @@ FRONTEND_HOST = config('FRONTEND_HOST')
 
 REST_FRAMEWORK = {
      'DEFAULT_AUTHENTICATION_CLASSES': (
-        'myapp.authentication.CookiesJWTAuthenticate',
+        'echofy.authentication.CookiesJWTAuthenticate',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -169,16 +169,16 @@ CLOUDINARY = {
 
 
 JAZZMIN_SETTINGS = {
-    "site_title": "HearingAid Admin",
-    "site_header": "HearingAid Admin",
-    "site_brand": "HearingAid",
-    "welcome_sign": "Welcome to the HearingAid dashboard",
+    "site_title": "Echofy Admin",
+    "site_header": "Echofy Admin",
+    "site_brand": "Echofy",
+    "welcome_sign": "Welcome to the Echofy dashboard",
     "search_model": [
-        "myapp.CustomUser",
-        "myapp.PasswordResetOTP",
-        "myapp.TestModel",
-        "myapp.TestSession",
-        "myapp.Blog",
-        "myapp.ReviewModel"
+        "echofy.CustomUser",
+        "echofy.PasswordResetOTP",
+        "echofy.TestModel",
+        "echofy.TestSession",
+        "echofy.Blog",
+        "echofy.ReviewModel"
     ],
 }
