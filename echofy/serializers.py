@@ -15,35 +15,45 @@ class TestModelSerializer(serializers.ModelSerializer):
         fields = ['id', 'type', 'question', 'audio', 'correctAnswer', 'level', 'added_by','language']
 
 
+from rest_framework import serializers
+from django.contrib.auth.password_validation import validate_password
+from .models import CustomUser as User  
+
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, min_length=8)
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     confirm_password = serializers.CharField(write_only=True, required=True)
-    role = serializers.ChoiceField(choices=User.ROLE_CHOICES, required=False)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'confirm_password', 'role']
+        fields = ('full_name', 'username', 'email', 'password', 'confirm_password', 'role')
+        extra_kwargs = {
+            'full_name': {'required': True},
+            'email': {'required': True},
+            'username': {'required': True}
+        }
 
-    def validate(self, data):
-        if data['password'] != data['confirm_password']:
-            raise serializers.ValidationError("Passwords do not match.")
-        return data
+    def validate(self, attrs):
+        if attrs['password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({"password": "Password fields didn't match."})
+        return attrs
 
     def create(self, validated_data):
-        validated_data.pop('confirm_password')
+        # Remove confirm_password as it's not a model field
+        validated_data.pop('confirm_password', None)
+        
         user = User.objects.create_user(
+            full_name=validated_data['full_name'],
             username=validated_data['username'],
-            email=validated_data.get('email'),
+            email=validated_data['email'],
             password=validated_data['password'],
-            role=validated_data.get('role', 'staff'),
+            role=validated_data.get('role', 'user')  # Default to 'user' if not provided
         )
         return user
-
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'role', 'full_name', 'activated']
+        fields = ['id', 'full_name', 'username', 'email', 'role', 'activated']
         extra_kwargs = {
             'email': {'required': True},
             'username': {'required': True}

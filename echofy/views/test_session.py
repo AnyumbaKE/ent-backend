@@ -33,14 +33,18 @@ def start_test_session(request):
     serializer = TestSessionSerializer(session)
     return Response(serializer.data)
 
-#Get by user
+#User Test Sessions
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_test_sessions(request):
-    sessions = TestSession.objects.filter(user=request.user).order_by('-started_at')
+    filters = request.GET.dict()
+    # Enforce user-based filtering
+    filters['user'] = request.user
+
+    # Apply filters and order by latest session
+    sessions = TestSession.objects.filter(**filters).order_by('-started_at')
     serializer = TestSessionSerializer(sessions, many=True)
     return Response(serializer.data)
-
 
 
 @api_view(['POST'])

@@ -9,6 +9,7 @@ from rest_framework_simplejwt.views import (
 from ..serializers import UserSerializer
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
+from ..permissions import IsActivatedUser, IsAdminUserRole
 
 User = get_user_model()
 
@@ -77,6 +78,11 @@ class CustomRefreshToken(TokenRefreshView):
 def is_authenticated(request):
     return Response({'authenticated': True})
 
+@api_view(['POST'])
+@permission_classes([IsActivatedUser])
+def is_activated(request):
+    return Response({'activated': True})
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_users(request):
@@ -109,3 +115,28 @@ def logout(request):
 
     except Exception as e:
         return Response({'success': False, 'error': str(e)}, status=400)
+    
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated, IsAdminUserRole])
+def toggle_user_activation(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+
+        new_status = request.data.get("activated")
+        if new_status is None:
+            return Response({"error": "Missing 'activated' in request body"}, status=400)
+
+        user.activated = new_status
+        user.save()
+
+        return Response({
+            "success": True,
+            "user_id": user.id,
+            "activated": user.activated
+        })
+
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
