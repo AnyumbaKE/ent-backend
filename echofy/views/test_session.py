@@ -27,7 +27,7 @@ def get_all_test_sessions(request):
 def start_test_session(request):
     mode = request.data.get('mode')
     if mode not in ['easy', 'medium', 'hard']:
-        return Response({'error': 'Invalid mode'}, status=400)
+        return Response({'error': 'Invalid level'}, status=400)
 
     session = TestSession.objects.create(user=request.user, mode=mode)
     serializer = TestSessionSerializer(session)
